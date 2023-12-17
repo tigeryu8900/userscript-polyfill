@@ -57,7 +57,10 @@ app.all("*", async (req, res) => {
         }
         if (req.path.endsWith(".user.js")) {
             let script = await response.text();
-            res.send(script.replace(/(?<===\/UserScript==\s*?\n)/, String.raw`
+            res.send(script
+                .replaceAll(dstURL, ((process.env.RENDER_EXTERNAL_URL ?? `${req.protocol}://${req.get("host")}`)
+                    + `${req.originalUrl}`).replaceAll("$", "$$$$"))
+                .replace(/(?<===\/UserScript==\s*?\n)/, String.raw`
                 const __old_GM__ = {
                     GM_getValue,
                     GM: { ...GM }
